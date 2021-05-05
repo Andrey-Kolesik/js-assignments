@@ -22,7 +22,7 @@
  *    'Sun, 17 May 1998 03:00:00 GMT+01' => Date()
  */
 function parseDataFromRfc2822(value) {
-   throw new Error('Not implemented');
+   return new Date(value);
 }
 
 /**
@@ -37,7 +37,7 @@ function parseDataFromRfc2822(value) {
  *    '2016-01-19T08:07:37Z' => Date()
  */
 function parseDataFromIso8601(value) {
-   throw new Error('Not implemented');
+   return new Date(value).getTime();
 }
 
 
@@ -56,7 +56,7 @@ function parseDataFromIso8601(value) {
  *    Date(2015,1,1)    => false
  */
 function isLeapYear(date) {
-   throw new Error('Not implemented');
+    return ((date.getFullYear() % 4 == 0) && (date.getFullYear() % 100 != 0)) || (date.getFullYear() % 400 == 0);
 }
 
 
@@ -76,7 +76,23 @@ function isLeapYear(date) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
 function timeSpanToString(startDate, endDate) {
-   throw new Error('Not implemented');
+   var diff = (endDate - startDate);
+   var hours = Math.floor(diff / (1000 * 60 * 60));
+   diff -= hours * (1000 * 60 * 60);
+
+   var mins = Math.floor(diff / (1000 * 60));
+   diff -= mins * (1000 * 60);
+
+   var seconds = Math.floor(diff / (1000));
+   diff -= seconds * (1000);
+
+   var dat = new Date();
+   dat.setHours(hours - 21);
+   dat.setMinutes(mins);
+   dat.setSeconds(seconds);
+   dat.setMilliseconds(diff);
+   return `${dat.toISOString().substring(11).replace('Z', '')}`;
+
 }
 
 
@@ -94,7 +110,16 @@ function timeSpanToString(startDate, endDate) {
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
 function angleBetweenClockHands(date) {
-    throw new Error('Not implemented');
+    var h = date.getUTCHours();
+    var m = date.getUTCMinutes();
+    if(h > 12) {
+        h -= 12;
+    }
+    var hAngle = 0.5 * (h * 60 + m);
+    var mAngle = 6 * m;
+    var angle = Math.abs(hAngle - mAngle);
+    angle = Math.min(angle, 360 - angle);
+    return angle * Math.PI / 180;
 }
 
 
@@ -105,3 +130,14 @@ module.exports = {
     timeSpanToString: timeSpanToString,
     angleBetweenClockHands: angleBetweenClockHands
 };
+
+
+// var hour = date.getUTCHours();
+//    var minutes = date.getUTCMinutes();
+//    var h = (hour * 360) / 12 + (minutes * 360) / (12 * 60);
+//    var m = (minutes * 360) / 60;
+//    var angle = Math.abs(h - m);
+//    if(angle > 180) {
+//        angle = 360 - angle;
+//    }
+//    return angle;
